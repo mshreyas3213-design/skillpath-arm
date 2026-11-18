@@ -1,41 +1,28 @@
 package com.bharatai.learningcompanion.ai
 
-import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class GoalParserTest {
-
-    private val goodJson =
-        """{"role":"Android developer","weeks":8,"hoursPerWeek":10,"experience":"beginner"}"""
-
-    @Test
-    fun `valid reply returns success on first attempt`() = runTest {
-        val parser = GoalParser(FakeLlmEngine(listOf(goodJson)))
-        val result = parser.parse("learn Android in 8 weeks, 10h/week, beginner")
-
-        assertTrue(result is GoalParser.Result.Success)
-        val profile = (result as GoalParser.Result.Success).profile
-        assertEquals("Android developer", profile.role)
-        assertEquals(8, profile.weeks)
-        assertEquals(10, profile.hoursPerWeek)
+    @Test fun goodReplyWorks() = runBlocking {
+        val result = GoalParser(FakeLlmEngine()).parse("I want to be a data analyst")
+        assertTrue(result is ParseResult.Success)
+        val profile = (result as ParseResult.Success).profile
+        assertEquals("data_analyst", profile.roleId)
+        assertEquals(6, profile.hoursPerWeek)
     }
 
-    @Test
-    fun `invalid then valid reply returns success after retry`() = runTest {
-        val parser = GoalParser(FakeLlmEngine(listOf("not json at all", goodJson)))
-        val result = parser.parse("same goal")
-
-        assertTrue(result is GoalParser.Result.Success)
-        assertEquals("Android developer", (result as GoalParser.Result.Success).profile.role)
+    @Test fun badThenGoodRetries() = runBlocking {
+        val engine = FakeLlmEngine(listOf("sorry, here you go!"))  // first reply is broken
+        val result = GoalParser(engine).parse("anything")
+        assertTrue(result is ParseResult.Success)
+        assertEquals(2, engine.promptsSeen.size)
     }
 
-    @Test
-    fun `three invalid replies return failure`() = runTest {
-        val parser = GoalParser(FakeLlmEngine(listOf("nope", "still nope", "{}")))
-        val result = parser.parse("same goal")
-
-        assertTrue(result is GoalParser.Result.Failure)
+    @Test fun threeBadRepliesFail() = runBlocking {
+        val engine = FakeLlmEngine(listOf("no", "still no", "nope"))
+        assertTrue(GoalParser(engine).parse("x") is ParseResult.Failure)
     }
 }

@@ -1,52 +1,59 @@
-package com.bharatal.learningcompanion
+package com.bharatai.learningcompanion
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun PlanScreen() {
-    val weeklyPlan = listOf(
-        "Week 1: Statistics Basics & Hypothesis Testing (6h)",
-        "Week 2: SQL Basics & Advanced SQL (6h)",
-        "Week 3: Python Basics (2.5h) + Data Cleaning with Pandas (3.5h)",
-        "Week 4: Pandas Deep Dive (6h)",
-        "Week 5: Practice Quiz & Review (6h)",
-        "Week 6: Data Visualization (6h)",
-        "Week 7: Mini-Project (6h)",
-        "Week 8: Final Review & Assessment (6h)"
-    )
-
-    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+fun PlanScreen(
+    studyPlan: String,
+    isLoading: Boolean,
+    errorMessage: String?,
+    navigateToChat: () -> Unit  // <-- Added this parameter
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         Text(
-            text = "Your Weekly Pathway",
+            text = "Your Personalized Study Plan",
             style = MaterialTheme.typography.headlineMedium
         )
-        Text(
-            text = "Based on 8 weeks available and 6 hours/week.",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
-        LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            items(weeklyPlan) { week ->
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
-                ) {
-                    Text(
-                        text = week,
-                        modifier = Modifier.padding(16.dp),
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                }
+        if (isLoading) {
+            CircularProgressIndicator()
+            Spacer(modifier = Modifier.height(16.dp))
+            Text("AI is building your roadmap...")
+        } else if (errorMessage != null) {
+            Text("Error: $errorMessage", color = MaterialTheme.colorScheme.error)
+        } else {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                )
+            ) {
+                Text(
+                    text = studyPlan.ifBlank { "No plan generated yet." },
+                    modifier = Modifier.padding(16.dp)
+                )
             }
+        }
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        Button(
+            onClick = navigateToChat,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Chat with AI Companion")
         }
     }
 }

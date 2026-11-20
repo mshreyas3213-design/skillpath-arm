@@ -1,92 +1,80 @@
 package com.bharatai.learningcompanion
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.bharatai.learningcompanion.ai.FakeLlmEngine
-import com.bharatai.learningcompanion.ai.GoalParser
-import com.bharatai.learningcompanion.ai.ParseResult
-import kotlinx.coroutines.launch
+import androidx.compose.ui.unit.sp
 
 @Composable
-fun OnboardingScreen() {
-    // FakeLlmEngine is the stand-in until Batool's real model is plugged in.
-    val parser = remember { GoalParser(FakeLlmEngine()) }
-    val scope = rememberCoroutineScope()
-
-    var goalText by remember { mutableStateOf("") }
-    var loading by remember { mutableStateOf(false) }
-    var resultText by remember { mutableStateOf("") }
+fun OnboardingScreen(
+    viewModel: LearningViewModel, // This is the "door" AppNav is looking for
+    navigateToGaps: () -> Unit    // This replaces your old "onNext"
+) {
+    var name by remember { mutableStateOf("") }
+    var goal by remember { mutableStateOf("") }
+    var currentSkills by remember { mutableStateOf("") }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
-            .verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.Top
+            .padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "Tell me your learning goal",
-            style = MaterialTheme.typography.headlineSmall
+            text = "Welcome to AI Learning Companion",
+            fontSize = 24.sp,
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.headlineMedium
         )
-        Spacer(modifier = Modifier.height(12.dp))
+
+        Spacer(modifier = Modifier.height(32.dp))
 
         OutlinedTextField(
-            value = goalText,
-            onValueChange = { goalText = it },
-            label = { Text("For example: I want to become a data analyst in 8 weeks, 6 hours a week") },
+            value = name,
+            onValueChange = { name = it },
+            label = { Text("Your Name") },
             modifier = Modifier.fillMaxWidth()
         )
-        Spacer(modifier = Modifier.height(12.dp))
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        OutlinedTextField(
+            value = goal,
+            onValueChange = { goal = it },
+            label = { Text("What do you want to learn?") },
+            modifier = Modifier.fillMaxWidth(),
+            minLines = 2
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        OutlinedTextField(
+            value = currentSkills,
+            onValueChange = { currentSkills = it },
+            label = { Text("Your current skills") },
+            modifier = Modifier.fillMaxWidth(),
+            minLines = 2
+        )
+
+        Spacer(modifier = Modifier.height(32.dp))
 
         Button(
             onClick = {
-                scope.launch {
-                    loading = true
-                    resultText = ""
-                    val result = parser.parse(goalText)
-                    resultText = when (result) {
-                        is ParseResult.Success -> "Profile found:\n${result.profile}"
-                        is ParseResult.Failure -> "Could not understand that: ${result.error}"
-                    }
-                    loading = false
-                }
+                viewModel.analyzeGaps(
+                    goals = goal,
+                    currentSkills = if (currentSkills.isBlank()) "Beginner" else currentSkills
+                )
+                navigateToGaps()
             },
-            enabled = goalText.isNotBlank() && !loading
+            modifier = Modifier.fillMaxWidth(),
+            enabled = name.isNotBlank() && goal.isNotBlank()
         ) {
-            Text("Continue")
-        }
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        if (loading) {
-            CircularProgressIndicator()
-        }
-
-        if (resultText.isNotEmpty()) {
-            Text(
-                text = resultText,
-                style = MaterialTheme.typography.bodyLarge
-            )
+            Text("Analyze & Continue")
         }
     }
 }

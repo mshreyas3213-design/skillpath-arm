@@ -1,0 +1,931 @@
+{
+ "fixture": {
+  "required": {
+   "spreadsheets": 0.6,
+   "stats_basics": 0.7,
+   "sql_basics": 0.8,
+   "python_basics": 0.6,
+   "pandas_cleaning": 0.7,
+   "sql_advanced": 0.7,
+   "data_viz": 0.7,
+   "hypothesis_testing": 0.6,
+   "eda": 0.7,
+   "dashboards": 0.6
+  },
+  "prereqs": [
+   [
+    "pandas_cleaning",
+    "python_basics"
+   ],
+   [
+    "sql_advanced",
+    "sql_basics"
+   ],
+   [
+    "data_viz",
+    "pandas_cleaning"
+   ],
+   [
+    "hypothesis_testing",
+    "stats_basics"
+   ],
+   [
+    "eda",
+    "pandas_cleaning"
+   ],
+   [
+    "eda",
+    "stats_basics"
+   ],
+   [
+    "dashboards",
+    "data_viz"
+   ],
+   [
+    "dashboards",
+    "sql_basics"
+   ]
+  ],
+  "resources": {
+   "spreadsheets": [
+    {
+     "id": "r_spreadsheets_01",
+     "hours": 5
+    }
+   ],
+   "stats_basics": [
+    {
+     "id": "r_stats_basics_01",
+     "hours": 10
+    }
+   ],
+   "sql_basics": [
+    {
+     "id": "r_sql_basics_01",
+     "hours": 3
+    }
+   ],
+   "python_basics": [
+    {
+     "id": "r_python_basics_01",
+     "hours": 5
+    }
+   ],
+   "pandas_cleaning": [
+    {
+     "id": "r_pandas_cleaning_01",
+     "hours": 4
+    }
+   ],
+   "sql_advanced": [
+    {
+     "id": "r_sql_advanced_01",
+     "hours": 4
+    }
+   ],
+   "data_viz": [
+    {
+     "id": "r_data_viz_01",
+     "hours": 4
+    }
+   ],
+   "hypothesis_testing": [
+    {
+     "id": "r_hypothesis_testing_01",
+     "hours": 6
+    }
+   ],
+   "eda": [
+    {
+     "id": "r_eda_01",
+     "hours": 10
+    }
+   ],
+   "dashboards": [
+    {
+     "id": "r_dashboards_01",
+     "hours": 3
+    }
+   ]
+  }
+ },
+ "tests": [
+  {
+   "name": "01 perfect learner: no gaps, no plan",
+   "mastery_default": "required",
+   "overrides": {},
+   "hours_per_week": 6,
+   "weeks": 4,
+   "expect": {
+    "gaps": {},
+    "pathway": [],
+    "hours": {},
+    "summary": {
+     "planned_hours": 0,
+     "stretch_hours": 0,
+     "weeks_used": 0,
+     "overflow": false,
+     "stretch_skills": []
+    }
+   }
+  },
+  {
+   "name": "02 zero mastery, plenty of time (hand-built 6-week plan)",
+   "mastery_default": 0.0,
+   "overrides": {},
+   "hours_per_week": 10,
+   "weeks": 8,
+   "expect": {
+    "gaps": {
+     "spreadsheets": 0.6,
+     "stats_basics": 0.7,
+     "sql_basics": 0.8,
+     "python_basics": 0.6,
+     "pandas_cleaning": 0.7,
+     "sql_advanced": 0.7,
+     "data_viz": 0.7,
+     "hypothesis_testing": 0.6,
+     "eda": 0.7,
+     "dashboards": 0.6
+    },
+    "pathway": [
+     "sql_basics",
+     "sql_advanced",
+     "stats_basics",
+     "hypothesis_testing",
+     "python_basics",
+     "pandas_cleaning",
+     "data_viz",
+     "eda",
+     "dashboards",
+     "spreadsheets"
+    ],
+    "hours": {
+     "sql_basics": 3,
+     "sql_advanced": 4,
+     "stats_basics": 10,
+     "hypothesis_testing": 6,
+     "python_basics": 5,
+     "pandas_cleaning": 4,
+     "data_viz": 4,
+     "eda": 10,
+     "dashboards": 3,
+     "spreadsheets": 5
+    },
+    "summary": {
+     "planned_hours": 54,
+     "stretch_hours": 0,
+     "weeks_used": 6,
+     "overflow": false,
+     "stretch_skills": []
+    },
+    "weeks": {
+     "1": [
+      [
+       "sql_basics",
+       3
+      ],
+      [
+       "sql_advanced",
+       4
+      ],
+      [
+       "stats_basics",
+       3
+      ]
+     ],
+     "2": [
+      [
+       "stats_basics",
+       7
+      ],
+      [
+       "hypothesis_testing",
+       3
+      ]
+     ],
+     "3": [
+      [
+       "hypothesis_testing",
+       3
+      ],
+      [
+       "python_basics",
+       5
+      ],
+      [
+       "pandas_cleaning",
+       2
+      ]
+     ],
+     "4": [
+      [
+       "pandas_cleaning",
+       2
+      ],
+      [
+       "data_viz",
+       4
+      ],
+      [
+       "eda",
+       4
+      ]
+     ],
+     "5": [
+      [
+       "eda",
+       6
+      ],
+      [
+       "dashboards",
+       3
+      ],
+      [
+       "spreadsheets",
+       1
+      ]
+     ],
+     "6": [
+      [
+       "spreadsheets",
+       4
+      ]
+     ]
+    }
+   }
+  },
+  {
+   "name": "03 zero mastery, deadline too tight: stretch + overflow",
+   "mastery_default": 0.0,
+   "overrides": {},
+   "hours_per_week": 5,
+   "weeks": 6,
+   "expect": {
+    "summary": {
+     "planned_hours": 30,
+     "stretch_hours": 24,
+     "weeks_used": 6,
+     "overflow": true,
+     "stretch_skills": [
+      "pandas_cleaning",
+      "data_viz",
+      "eda",
+      "dashboards",
+      "spreadsheets"
+     ]
+    }
+   }
+  },
+  {
+   "name": "04 single gap: sql_basics 0.4 -> 1.5 h",
+   "mastery_default": "required",
+   "overrides": {
+    "sql_basics": 0.4
+   },
+   "hours_per_week": 5,
+   "weeks": 4,
+   "expect": {
+    "gaps": {
+     "sql_basics": 0.4
+    },
+    "pathway": [
+     "sql_basics"
+    ],
+    "hours": {
+     "sql_basics": 1.5
+    },
+    "summary": {
+     "planned_hours": 1.5,
+     "stretch_hours": 0,
+     "weeks_used": 1,
+     "overflow": false,
+     "stretch_skills": []
+    },
+    "weeks": {
+     "1": [
+      [
+       "sql_basics",
+       1.5
+      ]
+     ]
+    }
+   }
+  },
+  {
+   "name": "05 mastery above required gives no gap",
+   "mastery_default": "required",
+   "overrides": {
+    "python_basics": 0.9,
+    "sql_basics": 0.0
+   },
+   "hours_per_week": 6,
+   "weeks": 2,
+   "expect": {
+    "gaps": {
+     "sql_basics": 0.8
+    },
+    "pathway": [
+     "sql_basics"
+    ],
+    "hours": {
+     "sql_basics": 3
+    },
+    "summary": {
+     "planned_hours": 3,
+     "stretch_hours": 0,
+     "weeks_used": 1,
+     "overflow": false,
+     "stretch_skills": []
+    }
+   }
+  },
+  {
+   "name": "06 prerequisite first even with smaller gap",
+   "mastery_default": "required",
+   "overrides": {
+    "python_basics": 0.3,
+    "pandas_cleaning": 0.0,
+    "data_viz": 0.0
+   },
+   "hours_per_week": 6,
+   "weeks": 4,
+   "expect": {
+    "gaps": {
+     "python_basics": 0.3,
+     "pandas_cleaning": 0.7,
+     "data_viz": 0.7
+    },
+    "pathway": [
+     "python_basics",
+     "pandas_cleaning",
+     "data_viz"
+    ],
+    "hours": {
+     "python_basics": 2.5,
+     "pandas_cleaning": 4,
+     "data_viz": 4
+    },
+    "summary": {
+     "planned_hours": 10.5,
+     "stretch_hours": 0,
+     "weeks_used": 2,
+     "overflow": false,
+     "stretch_skills": []
+    },
+    "weeks": {
+     "1": [
+      [
+       "python_basics",
+       2.5
+      ],
+      [
+       "pandas_cleaning",
+       3.5
+      ]
+     ],
+     "2": [
+      [
+       "pandas_cleaning",
+       0.5
+      ],
+      [
+       "data_viz",
+       4
+      ]
+     ]
+    }
+   }
+  },
+  {
+   "name": "07 zero mastery, 40 h in 1 week: skill split between planned and stretch",
+   "mastery_default": 0.0,
+   "overrides": {},
+   "hours_per_week": 40,
+   "weeks": 1,
+   "expect": {
+    "summary": {
+     "planned_hours": 40,
+     "stretch_hours": 14,
+     "weeks_used": 1,
+     "overflow": true,
+     "stretch_skills": [
+      "eda",
+      "dashboards",
+      "spreadsheets"
+     ]
+    }
+   }
+  },
+  {
+   "name": "08 exact fit: 54 h in 6 weeks of 9 h",
+   "mastery_default": 0.0,
+   "overrides": {},
+   "hours_per_week": 9,
+   "weeks": 6,
+   "expect": {
+    "summary": {
+     "planned_hours": 54,
+     "stretch_hours": 0,
+     "weeks_used": 6,
+     "overflow": false,
+     "stretch_skills": []
+    }
+   }
+  },
+  {
+   "name": "09 half gap: stats_basics 0.35 -> 5 h",
+   "mastery_default": "required",
+   "overrides": {
+    "stats_basics": 0.35
+   },
+   "hours_per_week": 5,
+   "weeks": 1,
+   "expect": {
+    "gaps": {
+     "stats_basics": 0.35
+    },
+    "pathway": [
+     "stats_basics"
+    ],
+    "hours": {
+     "stats_basics": 5
+    },
+    "summary": {
+     "planned_hours": 5,
+     "stretch_hours": 0,
+     "weeks_used": 1,
+     "overflow": false,
+     "stretch_skills": []
+    }
+   }
+  },
+  {
+   "name": "10 tiny capacity: 2 h available, 3 h needed",
+   "mastery_default": "required",
+   "overrides": {
+    "sql_basics": 0.0
+   },
+   "hours_per_week": 2,
+   "weeks": 1,
+   "expect": {
+    "gaps": {
+     "sql_basics": 0.8
+    },
+    "pathway": [
+     "sql_basics"
+    ],
+    "hours": {
+     "sql_basics": 3
+    },
+    "summary": {
+     "planned_hours": 2,
+     "stretch_hours": 1,
+     "weeks_used": 1,
+     "overflow": true,
+     "stretch_skills": [
+      "sql_basics"
+     ]
+    }
+   }
+  }
+ ],
+ "adapt_tests": [
+  {
+   "name": "A1 on track (10 of 10 h): nothing changes",
+   "hours_per_week": 10,
+   "weeks": 8,
+   "week": 1,
+   "hours_done": 10,
+   "mini_quiz": {},
+   "expect": {
+    "week_done": [
+     [
+      "sql_basics",
+      3
+     ],
+     [
+      "sql_advanced",
+      4
+     ],
+     [
+      "stats_basics",
+      3
+     ]
+    ],
+    "weeks": {
+     "2": [
+      [
+       "stats_basics",
+       7
+      ],
+      [
+       "hypothesis_testing",
+       3
+      ]
+     ],
+     "3": [
+      [
+       "hypothesis_testing",
+       3
+      ],
+      [
+       "python_basics",
+       5
+      ],
+      [
+       "pandas_cleaning",
+       2
+      ]
+     ]
+    },
+    "summary": {
+     "planned_hours": 44,
+     "stretch_hours": 0,
+     "overflow": false,
+     "stretch_skills": []
+    },
+    "completed": [],
+    "revision": []
+   }
+  },
+  {
+   "name": "A2 behind (5 of 10 h): unfinished work moves later",
+   "hours_per_week": 10,
+   "weeks": 8,
+   "week": 1,
+   "hours_done": 5,
+   "mini_quiz": {},
+   "expect": {
+    "week_done": [
+     [
+      "sql_basics",
+      3
+     ],
+     [
+      "sql_advanced",
+      2
+     ]
+    ],
+    "weeks": {
+     "2": [
+      [
+       "sql_advanced",
+       2
+      ],
+      [
+       "stats_basics",
+       8
+      ]
+     ],
+     "3": [
+      [
+       "stats_basics",
+       2
+      ],
+      [
+       "hypothesis_testing",
+       6
+      ],
+      [
+       "python_basics",
+       2
+      ]
+     ],
+     "4": [
+      [
+       "python_basics",
+       3
+      ],
+      [
+       "pandas_cleaning",
+       4
+      ],
+      [
+       "data_viz",
+       3
+      ]
+     ],
+     "5": [
+      [
+       "data_viz",
+       1
+      ],
+      [
+       "eda",
+       9
+      ]
+     ],
+     "6": [
+      [
+       "eda",
+       1
+      ],
+      [
+       "dashboards",
+       3
+      ],
+      [
+       "spreadsheets",
+       5
+      ]
+     ]
+    },
+    "summary": {
+     "planned_hours": 49,
+     "stretch_hours": 0,
+     "overflow": false,
+     "stretch_skills": []
+    },
+    "completed": [],
+    "revision": []
+   }
+  },
+  {
+   "name": "A3 mini-quiz passes: sql_advanced complete, plan pulled forward",
+   "hours_per_week": 10,
+   "weeks": 8,
+   "week": 1,
+   "hours_done": 3,
+   "mini_quiz": {
+    "sql_advanced": 0.9
+   },
+   "expect": {
+    "week_done": [
+     [
+      "sql_basics",
+      3
+     ]
+    ],
+    "weeks": {
+     "2": [
+      [
+       "stats_basics",
+       10
+      ]
+     ],
+     "3": [
+      [
+       "hypothesis_testing",
+       6
+      ],
+      [
+       "python_basics",
+       4
+      ]
+     ],
+     "4": [
+      [
+       "python_basics",
+       1
+      ],
+      [
+       "pandas_cleaning",
+       4
+      ],
+      [
+       "data_viz",
+       4
+      ],
+      [
+       "eda",
+       1
+      ]
+     ],
+     "5": [
+      [
+       "eda",
+       9
+      ],
+      [
+       "dashboards",
+       1
+      ]
+     ],
+     "6": [
+      [
+       "dashboards",
+       2
+      ],
+      [
+       "spreadsheets",
+       5
+      ]
+     ]
+    },
+    "summary": {
+     "planned_hours": 47,
+     "stretch_hours": 0,
+     "overflow": false,
+     "stretch_skills": []
+    },
+    "completed": [
+     "sql_advanced"
+    ],
+    "revision": [],
+    "mastery": {
+     "sql_advanced": 0.7
+    }
+   }
+  },
+  {
+   "name": "A4 mini-quiz far below required: 1 h revision block first in next week",
+   "hours_per_week": 10,
+   "weeks": 8,
+   "week": 1,
+   "hours_done": 10,
+   "mini_quiz": {
+    "sql_basics": 0.3
+   },
+   "expect": {
+    "week_done": [
+     [
+      "sql_basics",
+      3
+     ],
+     [
+      "sql_advanced",
+      4
+     ],
+     [
+      "stats_basics",
+      3
+     ]
+    ],
+    "weeks": {
+     "2": [
+      [
+       "sql_basics",
+       1
+      ],
+      [
+       "stats_basics",
+       7
+      ],
+      [
+       "hypothesis_testing",
+       2
+      ]
+     ],
+     "3": [
+      [
+       "hypothesis_testing",
+       4
+      ],
+      [
+       "python_basics",
+       5
+      ],
+      [
+       "pandas_cleaning",
+       1
+      ]
+     ],
+     "4": [
+      [
+       "pandas_cleaning",
+       3
+      ],
+      [
+       "data_viz",
+       4
+      ],
+      [
+       "eda",
+       3
+      ]
+     ],
+     "5": [
+      [
+       "eda",
+       7
+      ],
+      [
+       "dashboards",
+       3
+      ]
+     ],
+     "6": [
+      [
+       "spreadsheets",
+       5
+      ]
+     ]
+    },
+    "summary": {
+     "planned_hours": 45,
+     "stretch_hours": 0,
+     "overflow": false,
+     "stretch_skills": []
+    },
+    "completed": [],
+    "revision": [
+     "sql_basics"
+    ],
+    "mastery": {
+     "sql_basics": 0.12
+    }
+   }
+  },
+  {
+   "name": "A5 did 0 h in week 1 of an exact-fit plan: overflow appears",
+   "hours_per_week": 9,
+   "weeks": 6,
+   "week": 1,
+   "hours_done": 0,
+   "mini_quiz": {},
+   "expect": {
+    "week_done": [],
+    "weeks": {
+     "2": [
+      [
+       "sql_basics",
+       3
+      ],
+      [
+       "sql_advanced",
+       4
+      ],
+      [
+       "stats_basics",
+       2
+      ]
+     ]
+    },
+    "summary": {
+     "planned_hours": 45,
+     "stretch_hours": 9,
+     "overflow": true,
+     "stretch_skills": [
+      "eda",
+      "dashboards",
+      "spreadsheets"
+     ]
+    },
+    "completed": [],
+    "revision": []
+   }
+  },
+  {
+   "name": "A6 passing a future skill frees hours: stretch shrinks from 24 h to 14 h",
+   "hours_per_week": 5,
+   "weeks": 6,
+   "week": 1,
+   "hours_done": 5,
+   "mini_quiz": {
+    "stats_basics": 0.8
+   },
+   "expect": {
+    "week_done": [
+     [
+      "sql_basics",
+      3
+     ],
+     [
+      "sql_advanced",
+      2
+     ]
+    ],
+    "weeks": {
+     "2": [
+      [
+       "sql_advanced",
+       2
+      ],
+      [
+       "hypothesis_testing",
+       3
+      ]
+     ],
+     "3": [
+      [
+       "hypothesis_testing",
+       3
+      ],
+      [
+       "python_basics",
+       2
+      ]
+     ]
+    },
+    "summary": {
+     "planned_hours": 25,
+     "stretch_hours": 14,
+     "overflow": true,
+     "stretch_skills": [
+      "eda",
+      "dashboards",
+      "spreadsheets"
+     ]
+    },
+    "completed": [
+     "stats_basics"
+    ],
+    "revision": [],
+    "mastery": {
+     "stats_basics": 0.7
+    }
+   }
+  }
+ ]
+}

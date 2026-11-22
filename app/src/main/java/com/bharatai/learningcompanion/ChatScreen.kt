@@ -3,7 +3,6 @@ package com.bharatai.learningcompanion
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.*
@@ -11,6 +10,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.shape.RoundedCornerShape
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -19,87 +19,46 @@ fun ChatScreen(
     navigateBack: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val listState = rememberLazyListState()
-    var messageText by remember { mutableStateOf("") }
+    var inputText by remember { mutableStateOf("") }
 
-    // Auto-scroll to bottom when new messages arrive
-    LaunchedEffect(uiState.chatHistory.size) {
-        if (uiState.chatHistory.isNotEmpty()) {
-            listState.animateScrollToItem(uiState.chatHistory.size - 1)
-        }
-    }
+    Column(modifier = Modifier.fillMaxSize()) {
+        TopAppBar(
+            title = { Text("AI Companion Chat") },
+            navigationIcon = { IconButton(onClick = navigateBack) { Text("←") } }
+        )
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("AI Companion Chat") },
-                navigationIcon = {
-                    IconButton(onClick = navigateBack) {
-                        Text("←")
-                    }
-                }
-            )
-        }
-    ) { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
+        LazyColumn(
+            modifier = Modifier.weight(1f).padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            // Chat Messages List
-            LazyColumn(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                state = listState,
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(uiState.chatHistory) { message ->
-                    ChatBubble(message)
-                }
-
-                if (uiState.isLoading) {
-                    item {
-                        Row(modifier = Modifier.fillMaxWidth()) {
-                            CircularProgressIndicator(modifier = Modifier.size(24.dp))
-                        }
-                    }
-                }
+            items(uiState.chatHistory) { message -> ChatBubble(message) }
+            if (uiState.isLoading) {
+                item { CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally)) }
             }
+        }
 
-            // Input Area
-            Surface(
-                modifier = Modifier.fillMaxWidth(),
-                tonalElevation = 3.dp
-            ) {
-                Row(
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    OutlinedTextField(
-                        value = messageText,
-                        onValueChange = { messageText = it },
-                        modifier = Modifier.weight(1f),
-                        placeholder = { Text("Ask your AI companion...") },
-                        maxLines = 3
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    IconButton(
-                        onClick = {
-                            if (messageText.isNotBlank()) {
-                                // Use the study plan as context for the AI
-                                viewModel.sendChatMessage(messageText, uiState.studyPlan)
-                                messageText = ""
-                            }
-                        },
-                        enabled = !uiState.isLoading
-                    ) {
-                        Icon(Icons.Default.Send, contentDescription = "Send")
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            OutlinedTextField(
+                value = inputText,
+                onValueChange = { inputText = it },
+                modifier = Modifier.weight(1f),
+                placeholder = { Text("Ask your AI companion...") },
+                shape = RoundedCornerShape(24.dp)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            IconButton(
+                onClick = {
+                    if (inputText.isNotBlank()) {
+                        viewModel.sendChatMessage(inputText, uiState.studyPlan)
+                        inputText = ""
                     }
-                }
+                },
+                enabled = !uiState.isLoading
+            ) {
+                Icon(Icons.Default.Send, contentDescription = "Send")
             }
         }
     }
@@ -107,25 +66,17 @@ fun ChatScreen(
 
 @Composable
 fun ChatBubble(message: ChatMessage) {
-    val backgroundColor = if (message.isUser) {
-        MaterialTheme.colorScheme.primary
-    } else {
-        MaterialTheme.colorScheme.surfaceVariant
-    }
-    val alignment = if (message.isUser) {
-        Alignment.End
-    } else {
-        Alignment.Start
-    }
+    val backgroundColor = if (message.isUser) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
+    val alignment = if (message.isUser) Alignment.CenterEnd else Alignment.CenterStart
 
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = if (message.isUser) Arrangement.End else Arrangement.Start
+    Box(
+        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+        contentAlignment = alignment
     ) {
         Surface(
+            shape = RoundedCornerShape(12.dp),
             color = backgroundColor,
-            shape = MaterialTheme.shapes.medium,
-            modifier = Modifier.widthIn(max = 280.dp)
+            shadowElevation = 2.dp
         ) {
             Text(
                 text = message.text,

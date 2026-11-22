@@ -19,9 +19,7 @@ fun AppNav(
             OnboardingScreen(
                 viewModel = viewModel,
                 navigateToGaps = {
-                    navController.navigate("gaps") {
-                        popUpTo("onboarding") { inclusive = true }
-                    }
+                    navController.navigate("gaps") { popUpTo("onboarding") { inclusive = true } }
                 }
             )
         }
@@ -31,13 +29,8 @@ fun AppNav(
                 isLoading = uiState.isLoading,
                 errorMessage = uiState.errorMessage,
                 onNext = {
-                    viewModel.createPlan(
-                        gaps = uiState.skillGaps,
-                        timeframe = "4 weeks"
-                    )
-                    navController.navigate("plan") {
-                        popUpTo("gaps") { inclusive = true }
-                    }
+                    viewModel.createPlan(gapsText = uiState.skillGaps, timeframe = "4 weeks")
+                    navController.navigate("plan") { popUpTo("gaps") { inclusive = true } }
                 }
             )
         }
@@ -46,9 +39,7 @@ fun AppNav(
                 studyPlan = uiState.studyPlan,
                 isLoading = uiState.isLoading,
                 errorMessage = uiState.errorMessage,
-                navigateToChat = {
-                    navController.navigate("chat")
-                }
+                navigateToChat = { navController.navigate("chat") }
             )
         }
         composable("chat") {

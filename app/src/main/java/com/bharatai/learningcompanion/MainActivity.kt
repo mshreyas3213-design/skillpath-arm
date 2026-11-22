@@ -15,19 +15,12 @@ import com.bharatai.learningcompanion.ui.theme.AILearningCompanionTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        val mockEngine = MockAIEngine()
+        val aiEngine: AIEngine = MockAIEngine()
 
         setContent {
             AILearningCompanionTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    val viewModel: LearningViewModel = viewModel(
-                        factory = LearningViewModelFactory(mockEngine)
-                    )
-
+                Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+                    val viewModel: LearningViewModel = viewModel(factory = LearningViewModelFactory(aiEngine))
                     AppNav(viewModel = viewModel)
                 }
             }

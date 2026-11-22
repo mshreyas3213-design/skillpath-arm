@@ -12,7 +12,7 @@ fun PlanScreen(
     studyPlan: String,
     isLoading: Boolean,
     errorMessage: String?,
-    navigateToChat: () -> Unit  // <-- Added this parameter
+    navigateToChat: () -> Unit
 ) {
     Column(
         modifier = Modifier

@@ -19,3 +19,10 @@ build/
 .cxx
 local.properties
 .idea/
+# Ignore massive AI model files
+*.pte
+*.safetensors
+*.bin
+*.model
+app/src/main/assets/*.pte
+app/src/main/assets/*.model

@@ -11,19 +11,6 @@ object LogicEngine {
     private fun r2(x: Double) = Math.round(x * 100.0) / 100.0
     private fun r4(x: Double) = Math.round(x * 10000.0) / 10000.0
 
-    fun nextDifficulty(current: Int, wasCorrect: Boolean): Int =
-        (current + if (wasCorrect) 1 else -1).coerceIn(1, 3)
-
-    fun scoreSkill(history: List<Pair<Int, Boolean>>): Double {
-        if (history.isEmpty()) return 0.0
-        val total = history.sumOf { it.first }
-        val got = history.filter { it.second }.sumOf { it.first }
-        return got.toDouble() / total
-    }
-
-    fun updateMastery(old: Double, latest: Double): Double =
-        MASTERY_OLD * old + MASTERY_NEW * latest
-
     fun computeGaps(required: Map<String, Double>, mastery: Map<String, Double>): List<Gap> =
         required.mapNotNull { (skill, req) ->
             val m = mastery[skill] ?: 0.0
@@ -50,8 +37,7 @@ object LogicEngine {
             val ready = by.keys.filter { it !in done && done.containsAll(deps.getValue(it)) }
             require(ready.isNotEmpty()) { "cycle in prerequisites" }
             val s = ready.sortedWith(compareBy<String>({ -by.getValue(it).gap }, { it })).first()
-            val res = resources[s]?.firstOrNull()
-                ?: throw IllegalArgumentException("no verified resource for $s")
+            val res = resources[s]?.firstOrNull() ?: throw IllegalArgumentException("no resource for $s")
             val g = by.getValue(s)
             out.add(PathwayItem(s, g.gap, res.id, hoursForSkill(res.hours, g.gap, g.required)))
             done.add(s)
@@ -59,43 +45,23 @@ object LogicEngine {
         return out
     }
 
-    private data class Work(
-        val skillId: String, val resourceId: String?, val hoursNeeded: Double, val status: String? = null
-    )
+    private data class Work(val skillId: String, val resourceId: String?, val hoursNeeded: Double, val status: String? = null)
+    private class WeekBuilder(val week: Int) { var total = 0.0; val items = mutableListOf<PlanItem>() }
 
-    private class WeekBuilder(val week: Int) {
-        var total = 0.0
-        val items = mutableListOf<PlanItem>()
-    }
-
-    private fun fill(
-        items: List<Work>, hoursPerWeek: Double, firstWeek: Int, status: String, maxHours: Double?
-    ): Pair<List<WeekBuilder>, List<Work>> {
+    private fun fill(items: List<Work>, hoursPerWeek: Double, firstWeek: Int, status: String, maxHours: Double?): Pair<List<WeekBuilder>, List<Work>> {
         val weeks = mutableListOf<WeekBuilder>()
         val leftover = mutableListOf<Work>()
-        var room = 0.0
-        var used = 0.0
-        var stopped = false
+        var room = 0.0; var used = 0.0; var stopped = false
         for (item in items) {
             var remaining = item.hoursNeeded
             while (remaining > EPS) {
-                if (stopped || (maxHours != null && used >= maxHours - EPS)) {
-                    stopped = true
-                    leftover.add(item.copy(hoursNeeded = r2(remaining)))
-                    break
-                }
-                if (room <= EPS) {
-                    weeks.add(WeekBuilder(firstWeek + weeks.size))
-                    room = hoursPerWeek
-                }
+                if (stopped || (maxHours != null && used >= maxHours - EPS)) { stopped = true; leftover.add(item.copy(hoursNeeded = r2(remaining))); break }
+                if (room <= EPS) { weeks.add(WeekBuilder(firstWeek + weeks.size)); room = hoursPerWeek }
                 val cap = if (maxHours == null) room else min(room, maxHours - used)
                 val take = r2(min(remaining, cap))
                 val wk = weeks.last()
                 wk.items.add(PlanItem(item.skillId, item.resourceId, take, item.status ?: status))
-                wk.total = r2(wk.total + take)
-                room = r2(room - take)
-                used = r2(used + take)
-                remaining = r2(remaining - take)
+                wk.total = r2(wk.total + take); room = r2(room - take); used = r2(used + take); remaining = r2(remaining - take)
             }
         }
         return Pair(weeks, leftover)
@@ -104,8 +70,7 @@ object LogicEngine {
     private fun pack(items: List<Work>, hoursPerWeek: Double, firstWeek: Int, lastWeek: Int): WeeklyPlan {
         val room = max(0.0, (lastWeek - firstWeek + 1).toDouble()) * hoursPerWeek
         val (planned, leftover) = fill(items, hoursPerWeek, firstWeek, "planned", room)
-        val stripped = leftover.map { it.copy(status = null) }
-        val (stretch, _) = fill(stripped, hoursPerWeek, lastWeek + 1, "stretch", null)
+        val (stretch, _) = fill(leftover.map { it.copy(status = null) }, hoursPerWeek, lastWeek + 1, "stretch", null)
         val weeks = (planned + stretch).map { PlanWeek(it.week, it.total, it.items.toList()) }
         return WeeklyPlan(weeks, leftover.isNotEmpty())
     }

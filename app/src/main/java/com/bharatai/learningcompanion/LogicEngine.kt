@@ -3,16 +3,9 @@ package com.bharatai.learningcompanion
 import kotlin.math.max
 import kotlin.math.min
 
-data class Gap(val skillId: String, val required: Double, val mastery: Double, val gap: Double)
-data class Resource(val id: String, val hours: Double)
-data class PathwayItem(val skillId: String, val gap: Double, val resourceId: String, val hoursNeeded: Double)
-data class PlanItem(val skillId: String, val resourceId: String?, val hours: Double, val status: String)
-data class WeekPlan(val week: Int, val totalHours: Double, val items: List<PlanItem>)
-data class WeeklyPlan(val weeks: List<WeekPlan>, val overflow: Boolean)
-
 object LogicEngine {
     private const val EPS = 1e-9
-    private const val MASTERY_OLD = 0.6   // starting values to tune
+    private const val MASTERY_OLD = 0.6
     private const val MASTERY_NEW = 0.4
 
     private fun r2(x: Double) = Math.round(x * 100.0) / 100.0
@@ -21,7 +14,6 @@ object LogicEngine {
     fun nextDifficulty(current: Int, wasCorrect: Boolean): Int =
         (current + if (wasCorrect) 1 else -1).coerceIn(1, 3)
 
-    /** history: list of (difficulty, wasCorrect). Returns 0..1. */
     fun scoreSkill(history: List<Pair<Int, Boolean>>): Double {
         if (history.isEmpty()) return 0.0
         val total = history.sumOf { it.first }
@@ -32,7 +24,6 @@ object LogicEngine {
     fun updateMastery(old: Double, latest: Double): Double =
         MASTERY_OLD * old + MASTERY_NEW * latest
 
-    /** gap = max(0, required - mastery). A missing mastery value counts as 0. */
     fun computeGaps(required: Map<String, Double>, mastery: Map<String, Double>): List<Gap> =
         required.mapNotNull { (skill, req) ->
             val m = mastery[skill] ?: 0.0
@@ -43,11 +34,10 @@ object LogicEngine {
     fun hoursForSkill(resourceHours: Double, gap: Double, required: Double): Double =
         if (required <= 0) 0.0 else r2(resourceHours * gap / required)
 
-    /** Prerequisites first; among ready skills the larger gap goes first, ties by skill id. */
     fun orderPathway(
         gaps: List<Gap>,
-        prereqs: List<Pair<String, String>>,   // (skill, prerequisite)
-        resources: Map<String, List<Resource>> // verified resources only
+        prereqs: List<Pair<String, String>>,
+        resources: Map<String, List<Resource>>
     ): List<PathwayItem> {
         val by = gaps.associateBy { it.skillId }
         val deps = by.keys.associateWith { mutableSetOf<String>() }
@@ -69,7 +59,6 @@ object LogicEngine {
         return out
     }
 
-    // ---------- scheduling ----------
     private data class Work(
         val skillId: String, val resourceId: String?, val hoursNeeded: Double, val status: String? = null
     )
@@ -113,15 +102,14 @@ object LogicEngine {
     }
 
     private fun pack(items: List<Work>, hoursPerWeek: Double, firstWeek: Int, lastWeek: Int): WeeklyPlan {
-        val room = max(0, lastWeek - firstWeek + 1) * hoursPerWeek
+        val room = max(0.0, (lastWeek - firstWeek + 1).toDouble()) * hoursPerWeek
         val (planned, leftover) = fill(items, hoursPerWeek, firstWeek, "planned", room)
         val stripped = leftover.map { it.copy(status = null) }
         val (stretch, _) = fill(stripped, hoursPerWeek, lastWeek + 1, "stretch", null)
-        val weeks = (planned + stretch).map { WeekPlan(it.week, it.total, it.items.toList()) }
+        val weeks = (planned + stretch).map { PlanWeek(it.week, it.total, it.items.toList()) }
         return WeeklyPlan(weeks, leftover.isNotEmpty())
     }
 
-    /** Fills week 1, 2, ... up to hours per week and the deadline; the rest becomes "stretch". */
     fun buildSchedule(pathway: List<PathwayItem>, hoursPerWeek: Double, weeksAvailable: Int): WeeklyPlan =
-        pack(pathway.map { Work(it.skillId, it.resourceId, it.hoursNeeded) }, hoursPerWeek, 1, weeksAvailable)
+        pack(pathway.map { Work(it.skillId, it.resourceId, it.hours) }, hoursPerWeek, 1, weeksAvailable)
 }

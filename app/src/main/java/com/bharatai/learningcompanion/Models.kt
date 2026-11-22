@@ -1,19 +1,45 @@
 package com.bharatai.learningcompanion
 
-// Gap, Resource, PathwayItem, PlanItem, WeekPlan and WeeklyPlan are defined in LogicEngine.kt.
-// Do not define them here again, or the build fails with "Redeclaration".
-
-// Quiz question and answer, as in the team contract (section 3.2).
-data class Question(
-    val id: String,
+data class Gap(
     val skillId: String,
-    val difficulty: Int,
-    val text: String,
-    val options: List<String>,
-    val correctIndex: Int
+    val required: Double,
+    val mastery: Double,
+    val gap: Double
 )
 
-data class Answer(
-    val questionId: String,
-    val chosenIndex: Int
+data class Resource(
+    val id: String,
+    val hours: Double
+)
+
+data class PathwayItem(
+    val skillId: String,
+    val gap: Double,
+    val resourceId: String,
+    val hours: Double,
+    val status: String = ""
+)
+
+data class PlanItem(
+    val skillId: String,
+    val resourceId: String?,
+    val hours: Double,
+    val status: String = ""
+)
+
+data class PlanWeek(
+    val week: Int,
+    val totalHours: Double,
+    val items: List<PlanItem>
+)
+
+data class WeeklyPlan(
+    val weeks: List<PlanWeek>,
+    val overflow: Boolean
+)
+
+data class Work(
+    val skillId: String,
+    val resourceId: String,
+    val hours: Double
 )

@@ -44,7 +44,7 @@ dependencies {
     implementation("androidx.compose.material3:material3:1.2.0")
     implementation("com.google.mediapipe:tasks-genai:0.10.14")
     implementation("androidx.navigation:navigation-compose:2.7.7")
-
+    testImplementation("org.json:json:20231013")
     // ✅ ADD THIS LINE
     implementation("androidx.datastore:datastore-preferences:1.0.0")
 }

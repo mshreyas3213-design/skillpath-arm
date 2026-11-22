@@ -15,16 +15,10 @@ fun GapsScreen(
     onNext: () -> Unit
 ) {
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
+        modifier = Modifier.fillMaxSize().padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            text = "Your Skill Gaps",
-            style = MaterialTheme.typography.headlineMedium
-        )
-
+        Text(text = "Your Skill Gaps", style = MaterialTheme.typography.headlineMedium)
         Spacer(modifier = Modifier.height(24.dp))
 
         if (isLoading) {
@@ -34,26 +28,14 @@ fun GapsScreen(
         } else if (errorMessage != null) {
             Text("Error: $errorMessage", color = MaterialTheme.colorScheme.error)
         } else {
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant
-                )
-            ) {
-                Text(
-                    text = skillGaps.ifBlank { "No gaps identified yet." },
-                    modifier = Modifier.padding(16.dp)
-                )
+            Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
+                Text(text = skillGaps.ifBlank { "No gaps identified yet." }, modifier = Modifier.padding(16.dp))
             }
         }
 
         Spacer(modifier = Modifier.weight(1f))
 
-        Button(
-            onClick = onNext,
-            modifier = Modifier.fillMaxWidth(),
-            enabled = !isLoading && skillGaps.isNotBlank()
-        ) {
+        Button(onClick = onNext, modifier = Modifier.fillMaxWidth(), enabled = !isLoading && skillGaps.isNotBlank()) {
             Text("Generate My Study Plan")
         }
     }
